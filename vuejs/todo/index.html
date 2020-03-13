@@ -2,11 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Vue.js App</title>
+    <title>Vue.js ToDo App</title>
     <link rel="stylesheet" href="main.css">
   </head>
   <body>
     <div id="app">
+      <h1>ToDoチュートリアル！！！</h1>
 
       <label v-for="label in options">
         <input type="radio"
@@ -33,7 +34,7 @@
             <td>{{ todo.comment }}</td>
             <td class="state">
               <button v-on:click="changeState(todo)">
-                {{ todo.state }}
+                {{ labels[todo.state] }}
               </button>
             </td>
             <td class="button">

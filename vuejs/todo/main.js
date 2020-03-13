@@ -35,6 +35,12 @@ const app = new Vue({
       return this.todos.filter(function(el) {
         return this.current < 0 ? true : this.current === el.state
       }, this)
+    },
+
+    labels() {
+      return this.options.reduce(function(a, b) {
+        return Object.assign(a, { [b.value]: b.label })
+      }, {})
     }
   },
 
