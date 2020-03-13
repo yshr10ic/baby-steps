@@ -36,7 +36,7 @@ const app = new Vue({
   },
 
   methods: {
-    doAdd: function(event, value) {
+    add: function(event, value) {
       var comment = this.$refs.comment
       if (!comment.value.length) {
         return
@@ -49,6 +49,15 @@ const app = new Vue({
       })
 
       comment.value = ''
+    },
+
+    changeState: function(todo) {
+      todo.state = todo.state ? 0 : 1
+    },
+
+    remove: function(todo) {
+      var index = this.todos.indexOf(todo)
+      this.todos.splice(index, 1)
     }
   }
 })

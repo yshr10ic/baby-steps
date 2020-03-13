@@ -23,17 +23,21 @@
             <td>{{ todo.id }}</td>
             <td>{{ todo.comment }}</td>
             <td class="state">
-              <button>{{ todo.state }}</button>
+              <button v-on:click="changeState(todo)">
+                {{ todo.state }}
+              </button>
             </td>
             <td class="button">
-              <button>削除</button>
+              <button v-on:click.ctrl="remove(todo)">
+                削除
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
 
       <h2>新しい作業の追加</h2>
-      <form class="add-form" v-on:submit.prevent="doAdd">
+      <form class="add-form" v-on:submit.prevent="add">
         コメント <input type="text" ref="comment">
         <button type="submit">追加</button>
       </form>
