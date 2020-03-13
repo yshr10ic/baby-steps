@@ -11,7 +11,7 @@ var todoStorage = {
     return todos
   },
   save: function(todos) {
-    localStorage.save(STORAGE_KEY, JSON.stringify(todos))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
   }
 }
 
@@ -21,6 +21,19 @@ const app = new Vue({
     todos: []
   },
   methods: {
-    // 使用するメソッド
+    doAdd: function(event, value) {
+      var comment = this.$refs.comment
+      if (!comment.value.length) {
+        return
+      }
+
+      this.todos.push({
+        id: todoStorage.uid++,
+        comment: comment.value,
+        state: 0
+      })
+
+      comment.value = ''
+    }
   }
 })
