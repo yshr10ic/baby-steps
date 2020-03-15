@@ -18,4 +18,5 @@ $ django-admin startproject tutorial .
 $ cd tutorial
 $ django-admin startapp quickstart
 $ cd ..
+$ python manage.py migrate
 ```
