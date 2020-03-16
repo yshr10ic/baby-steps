@@ -20,4 +20,5 @@ $ django-admin startapp quickstart
 $ cd ..
 $ python manage.py migrate
 $ python manage.py createsuperuser --email xxx --username xxx
+$ python manage.py runserver
 ```
