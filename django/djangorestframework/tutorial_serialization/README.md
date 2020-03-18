@@ -15,4 +15,7 @@ Pygments==2.6.1
 ## Command
 
 ```
+$ django-admin startproject tutorial
+$ cd tutorial
+$ python manage.py startapp snippets
 ```
