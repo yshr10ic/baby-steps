@@ -9,6 +9,7 @@
 ```
 Django==3.0.4
 djangorestframework==3.11.0
+Pygments==2.6.1
 ```
 
 ## Command
