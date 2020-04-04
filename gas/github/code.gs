@@ -19,9 +19,8 @@ function updateSheet(commitLogs) {
 }
 
 function getCommitLogs() {
-  var targetDate = new Date('2020/3/20 00:00:00');
-  var counter = 1;
-  const MAX_COUNTER = 3;
+  var targetDate = Moment.moment('2020/1/1 00:00:00', 'YYYY/M/D HH:mm:ss');
+  var today = Moment.moment();
   var commitLogs = [];
   
   do {
@@ -30,24 +29,23 @@ function getCommitLogs() {
     var totalCommitContributions = contributionsCollection['totalCommitContributions'];
     var commitContributionsByRepository = contributionsCollection['commitContributionsByRepository'];
     
-    Logger.log(Utilities.formatDate(targetDate, 'Asia/Tokyo', 'yyyy-MM-dd'));
-    Logger.log('totalCommitContributions is ' + totalCommitContributions);
-    Logger.log('commitContributionsByRepository.length is ' + commitContributionsByRepository.length);
+    // Logger.log(targetDate.format('YYYY-MM-DD'));
+    // Logger.log('totalCommitContributions is ' + totalCommitContributions);
+    // Logger.log('commitContributionsByRepository.length is ' + commitContributionsByRepository.length);
     
     for (var i = 0; i < commitContributionsByRepository.length; i++) {
       var repoName = commitContributionsByRepository[i]['repository']['name'];
       var contributionCount = commitContributionsByRepository[i]['contributions']['totalCount'];
       
-      Logger.log(repoName + ': ' + contributionCount);
+      // Logger.log(repoName + ': ' + contributionCount);
       
-      commitLogs.push({'date': Utilities.formatDate(targetDate, 'Asia/Tokyo', 'yyyy/MM/dd'), 'repoName': repoName, 'contributionCount': contributionCount});
+      commitLogs.push({'date': targetDate.format('YYYY/MM/DD'), 'repoName': repoName, 'contributionCount': contributionCount});
     }
     
-    targetDate.setDate(targetDate.getDate() + 1);
-    counter++;
-  } while(counter <= MAX_COUNTER);
+    targetDate = targetDate.add(1, 'days');
+  } while(today.diff(targetDate, 'days') > 0);
   
-  Logger.log(commitLogs);
+  // Logger.log(commitLogs);
   
   return commitLogs;
 }
@@ -62,12 +60,12 @@ function fetchUserName() {
 
   const json = fetchData(query);
 
-  Logger.log(json);
+  // Logger.log(json);
 }
 
 function fetchCommitLog(targetDate) {
-  var nextDate = new Date(targetDate);
-  nextDate.setDate(nextDate.getDate() + 1);
+  var nextDate = Moment.moment(targetDate);
+  nextDate = nextDate.add(1, 'days');
   
   var query = 
       Utilities.formatString('{\
@@ -87,12 +85,12 @@ function fetchCommitLog(targetDate) {
     }\
   }\
   }', 
-      Utilities.formatDate(targetDate, 'Asia/Tokyo', 'yyyy-MM-dd') + 'T00:00:00',
-      Utilities.formatDate(nextDate, 'Asia/Tokyo', 'yyyy-MM-dd') + 'T00:00:00');
+      targetDate.format('YYYY-MM-DD') + 'T00:00:00',
+      nextDate.format('YYYY-MM-DD') + 'T00:00:00');
   
   const json = fetchData(query);
 
-  Logger.log(json);
+  // Logger.log(json);
   
   return json;
 }
