@@ -1,5 +1,5 @@
 const GITHUB_URL = 'https://api.github.com/graphql';
-const TOKEN = '';
+const TOKEN = PropertiesService.getScriptProperties().getProperty('TOKEN');
 
 function exec() {
   commitLogs = getCommitLogs();
@@ -26,7 +26,7 @@ function getCommitLogs() {
   var json = fetchCommitLog(targetDate);
   var contributionsCollection = json['data']['viewer']['contributionsCollection'];
   var commitContributionsByRepository = contributionsCollection['commitContributionsByRepository'];
-  
+    
   for (var i = 0; i < commitContributionsByRepository.length; i++) {
     var repoName = commitContributionsByRepository[i]['repository']['name'];
     var contributionCount = commitContributionsByRepository[i]['contributions']['totalCount'];
@@ -74,9 +74,6 @@ function fetchUserName() {
 }
 
 function fetchCommitLog(targetDate) {
-  var nextDate = Moment.moment(targetDate);
-  nextDate = nextDate.add(1, 'days');
-  
   var query = 
       Utilities.formatString('{\
   viewer {\
@@ -95,8 +92,8 @@ function fetchCommitLog(targetDate) {
     }\
   }\
   }', 
-      targetDate.format('YYYY-MM-DD') + 'T00:00:00',
-      nextDate.format('YYYY-MM-DD') + 'T00:00:00');
+      targetDate.format('YYYY-MM-DD') + 'T00:00:00+09:00',
+      targetDate.format('YYYY-MM-DD') + 'T23:59:59+09:00');
   
   const json = fetchData(query);
   
