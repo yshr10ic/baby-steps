@@ -7,8 +7,15 @@ function exec() {
   var totalCommitContributions = contributionsCollection['totalCommitContributions'];
   var commitContributionsByRepository = contributionsCollection['commitContributionsByRepository'];
 
-  Logger.log(totalCommitContributions);
-  Logger.log(commitContributionsByRepository);
+  Logger.log('totalCommitContributions is ' + totalCommitContributions);
+  Logger.log('commitContributionsByRepository.length is ' + commitContributionsByRepository.length);
+
+  for (var i = 0; i < commitContributionsByRepository.length; i++) {
+    var repoName = commitContributionsByRepository[i]['repository']['name'];
+    var contributionCount = commitContributionsByRepository[i]['contributions']['totalCount'];
+
+    Logger.log(repoName + ': ' + contributionCount);
+  }
 }
 
 function fetchUserName() {
