@@ -19,6 +19,25 @@ function updateSheet(commitLogs) {
 }
 
 function getCommitLogs() {
+  var targetDate = Moment.moment();
+  targetDate = targetDate.subtract(1, 'days');
+  var commitLogs = [];
+  
+  var json = fetchCommitLog(targetDate);
+  var contributionsCollection = json['data']['viewer']['contributionsCollection'];
+  var commitContributionsByRepository = contributionsCollection['commitContributionsByRepository'];
+  
+  for (var i = 0; i < commitContributionsByRepository.length; i++) {
+    var repoName = commitContributionsByRepository[i]['repository']['name'];
+    var contributionCount = commitContributionsByRepository[i]['contributions']['totalCount'];
+    
+    commitLogs.push({'date': targetDate.format('YYYY/MM/DD'), 'repoName': repoName, 'contributionCount': contributionCount});
+  }
+  
+  return commitLogs;
+}
+
+function getCommitLogsPast() {
   var targetDate = Moment.moment('2020/1/1 00:00:00', 'YYYY/M/D HH:mm:ss');
   var today = Moment.moment();
   var commitLogs = [];
@@ -26,26 +45,17 @@ function getCommitLogs() {
   do {
     var json = fetchCommitLog(targetDate);
     var contributionsCollection = json['data']['viewer']['contributionsCollection'];
-    var totalCommitContributions = contributionsCollection['totalCommitContributions'];
     var commitContributionsByRepository = contributionsCollection['commitContributionsByRepository'];
-    
-    // Logger.log(targetDate.format('YYYY-MM-DD'));
-    // Logger.log('totalCommitContributions is ' + totalCommitContributions);
-    // Logger.log('commitContributionsByRepository.length is ' + commitContributionsByRepository.length);
     
     for (var i = 0; i < commitContributionsByRepository.length; i++) {
       var repoName = commitContributionsByRepository[i]['repository']['name'];
       var contributionCount = commitContributionsByRepository[i]['contributions']['totalCount'];
-      
-      // Logger.log(repoName + ': ' + contributionCount);
       
       commitLogs.push({'date': targetDate.format('YYYY/MM/DD'), 'repoName': repoName, 'contributionCount': contributionCount});
     }
     
     targetDate = targetDate.add(1, 'days');
   } while(today.diff(targetDate, 'days') > 0);
-  
-  // Logger.log(commitLogs);
   
   return commitLogs;
 }
@@ -59,8 +69,8 @@ function fetchUserName() {
      }';
 
   const json = fetchData(query);
-
-  // Logger.log(json);
+  
+  return json;
 }
 
 function fetchCommitLog(targetDate) {
@@ -89,8 +99,6 @@ function fetchCommitLog(targetDate) {
       nextDate.format('YYYY-MM-DD') + 'T00:00:00');
   
   const json = fetchData(query);
-
-  // Logger.log(json);
   
   return json;
 }
