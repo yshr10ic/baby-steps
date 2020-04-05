@@ -4,6 +4,53 @@ const TOKEN = PropertiesService.getScriptProperties().getProperty('TOKEN');
 function exec() {
   commitLogs = getCommitLogs();
   updateSheet(commitLogs);
+  body = getBody(commitLogs);
+  sendToSlack('notifications', body);
+}
+
+function sendToSlack(channel, body) {
+  const url = PropertiesService.getScriptProperties().getProperty('WEBHOOK_URL');
+  
+  const data = { 
+    'channel' : channel,
+    'username' : 'Octocat',
+    'attachments': [{
+      'color': '#fc166a',
+      'text' : body,
+    }]
+  };
+  
+  const payload = JSON.stringify(data);
+  const options = {
+    'method' : 'POST',
+    'contentType' : 'application/json',
+    'payload' : payload
+  };
+
+  UrlFetchApp.fetch(url, options);
+}
+
+function getBody(commitLogs){
+  var targetDate = Moment.moment();
+  targetDate = targetDate.subtract(1, 'days');
+  var targetDateStr = targetDate.format('YYYY/MM/DD');
+  var totalCount = 0;
+  
+  var body = '1日お疲れ様でした😊\n';
+  body += targetDateStr + 'のコミット数を集計しました。\n\n';
+  
+  if (commitLogs.length == 0) {
+    body += '```合計 0 件```\n';
+  } else {
+    body += '```';
+    for (var i = 0; i < commitLogs.length; i++) {
+      body += commitLogs[i]['repoName'] + ' のコミット数は ' + commitLogs[i]['contributionCount'] + ' 件\n';
+      totalCount += commitLogs[i]['contributionCount'];
+    }
+    body += '合計 ' + totalCount + ' 件```\n';
+  }
+  
+  return body;
 }
 
 function updateSheet(commitLogs) {
