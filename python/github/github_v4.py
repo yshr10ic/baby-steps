@@ -2,7 +2,7 @@ import requests
 import json
 
 
-TOKEN = 'da81de7c81736d1e2628f96eeaba1ae81f87b8e0'
+TOKEN = ''
 ENDPOINT = 'https://api.github.com/graphql'
 
 
