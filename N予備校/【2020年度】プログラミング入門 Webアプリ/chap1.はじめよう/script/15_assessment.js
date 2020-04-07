@@ -24,6 +24,12 @@ const answers = [
     '{userName}のいいところは自制心です。やばいと思ったときにしっかりと衝動を抑えられる{userName}が皆から評価されています。'
 ];
 
+userNameInput.onkeydown = event => {
+    if (event.key === 'Enter') {
+        assessmentButton.onclick();
+    }
+};
+
 assessmentButton.onclick = () => {
     const userName = userNameInput.value;
 
@@ -42,6 +48,24 @@ assessmentButton.onclick = () => {
     const result = assessment(userName);
     paragrah.innerText = result;
     resultDivided.appendChild(paragrah);
+
+    // ツイートエリアの作成
+    removeAllChildren(tweetDivided);
+    const anchor = document.createElement('a');
+    const hrefValue =
+        'https://twitter.com/intent/tweet?button_hashtag=' +
+        encodeURIComponent('あなたのいいところ') +
+        '&ref_src=twsrc%5Etfw';
+    anchor.setAttribute('href', hrefValue);
+    anchor.className = 'twitter-hashtag-button';
+    anchor.setAttribute('data-text', result);
+    anchor.innerText = 'Tweet #あなたのいいところ';
+    tweetDivided.appendChild(anchor);
+
+    // widgets.js の設定
+    const script = document.createElement('script');
+    script.setAttribute('src', 'https://platform.twitter.com/widgets.js');
+    tweetDivided.appendChild(script);
 }
 
 /**
