@@ -1,5 +1,10 @@
 'use strict';
 
+const userNameInput = document.getElementById('user-name');
+const assessmentButton = document.getElementById('assessment');
+const resultDivided = document.getElementById('result-area');
+const tweetDivided = document.getElementById('tweet-area');
+
 const answers = [
     '{userName}のいいところは声です。{userName}の特徴的な声は皆を惹きつけ、心に残ります。',
     '{userName}のいいところはまなざしです。{userName}に見つめられた人は、気になって仕方がないでしょう。',
@@ -18,6 +23,26 @@ const answers = [
     '{userName}のいいところはその全てです。ありのままの{userName}自身がいいところなのです。',
     '{userName}のいいところは自制心です。やばいと思ったときにしっかりと衝動を抑えられる{userName}が皆から評価されています。'
 ];
+
+assessmentButton.onclick = () => {
+    const userName = userNameInput.value;
+
+    if (userName.length === 0) {
+        return;
+    }
+
+    // 連続して診断結果が出ないように、すでにある場合は削除する
+    removeAllChildren(resultDivided);
+
+    const header = document.createElement('h3');
+    header.innerText = '診断結果';
+    resultDivided.appendChild(header);
+
+    const paragrah = document.createElement('p');
+    const result = assessment(userName);
+    paragrah.innerText = result;
+    resultDivided.appendChild(paragrah);
+}
 
 /**
  * 名前の文字列を渡すと診断結果を返す関数
@@ -40,7 +65,23 @@ function assessment(userName) {
     return result;
 }
 
+// テストコード
 console.assert(
     assessment('太郎') === '太郎のいいところは決断力です。太郎がする決断にいつも助けられる人がいます。',
     '診断結果の文言の特定の部分を名前に置き換える処理が正しくありません。'
 );
+console.assert(
+    assessment('太郎') === assessment('太郎'),
+    '入力が同じ名前なら同じ診断結果を出力する処理が正しくありません。'
+);
+
+/**
+ * 指定した要素の子どもを全て削除する
+ * @param {HTMLElement} element HTMLの要素
+ */
+function removeAllChildren(element) {
+    while (element.firstChild) {
+        // 子どもの要素があるかぎり削除
+        element.removeChild(element.firstChild);
+    }
+  }
