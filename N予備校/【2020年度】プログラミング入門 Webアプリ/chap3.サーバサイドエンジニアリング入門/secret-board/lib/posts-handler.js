@@ -1,10 +1,16 @@
 'use strict';
 
 const pug = require('pug');
+const Cookies = require('cookies');
 const util = require('./handler-util');
 const Post = require('./post');
 
+const trackingIdKey = 'tracking_id';
+
 function handle(req, res) {
+    const cookies = new Cookies(req, res);
+    addTrackingCookie(cookies);
+
     switch (req.method) {
         case 'GET':
             res.writeHead(200, {
@@ -15,6 +21,11 @@ function handle(req, res) {
                     './views/posts.pug',
                     { posts: posts }
                 ));
+                console.info(
+                    `閲覧されました: user: ${req.user}, ` +
+                    `trackingId: ${cookies.get(trackingIdKey) },` +
+                    `remoteAddress: ${req.connection.remoteAddress} `
+                );
             });
             break;
         case 'POST':
@@ -29,7 +40,7 @@ function handle(req, res) {
                     const content = decoded.split('content=')[1];
                     Post.create({
                         content: content,
-                        trackingCookie: null,
+                        trackingCookie: cookies.get(trackingIdKey),
                         postedBy: req.user
                     }).then(() => {
                         handleRedirectPosts(req, res);
@@ -39,6 +50,14 @@ function handle(req, res) {
         default:
             util.handleBadRequest(req, res);
             break;
+    }
+}
+
+function addTrackingCookie(cookies) {
+    if (!cookies.get(trackingIdKey)) {
+        const trackingId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+        const tomorrow = new Date(Date.now() + (1000 * 60 * 60 * 24));
+        cookies.set(trackingIdKey, trackingId, { expires: tomorrow });
     }
 }
 
