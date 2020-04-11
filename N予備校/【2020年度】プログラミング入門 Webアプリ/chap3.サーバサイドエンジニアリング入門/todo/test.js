@@ -1,19 +1,23 @@
 'use strict';
 
-const todo = require('./index.js');
+const fs = require('fs');
 const assert = require('assert');
 
-todo.addTodo('note');
-todo.addTodo('pen');
-assert.deepEqual(todo.list(), ['note', 'pen']);
+fs.unlink('./tasks.json', err => {
+    const todo = require('./index.js');
 
-todo.done('note');
-assert.deepEqual(todo.list(), ['pen']);
-assert.deepEqual(todo.doneList(), ['note']);
+    todo.addTodo('note');
+    todo.addTodo('pen');
+    assert.deepEqual(todo.list(), ['note', 'pen']);
 
-todo.del('note');
-todo.del('pen');
-assert.deepEqual(todo.list(), []);
-assert.deepEqual(todo.doneList(), []);
+    todo.done('note');
+    assert.deepEqual(todo.list(), ['pen']);
+    assert.deepEqual(todo.doneList(), ['note']);
 
-console.log('テストが正常に完了しました');
+    todo.del('note');
+    todo.del('pen');
+    assert.deepEqual(todo.list(), []);
+    assert.deepEqual(todo.doneList(), []);
+
+    console.log('テストが正常に完了しました');
+});

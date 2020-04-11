@@ -1,6 +1,23 @@
 'use strict';
 
-const tasks = new Array();
+const fs = require('fs');
+const fileName = './tasks.json';
+
+let tasks = new Array();
+
+try {
+    const data = fs.readFileSync(fileName, 'utf8');
+    tasks = JSON.parse(data);
+} catch (ignore) {
+    console.log(fileName + 'から復元できませんでした');
+}
+
+/**
+ * タスクをファイルに保存する
+ */
+function saveTasks() {
+    fs.writeFileSync(fileName, JSON.stringify(tasks), 'utf8');
+}
 
 /**
  * TODOを追加する
@@ -8,6 +25,7 @@ const tasks = new Array();
  */
 function addTodo(task) {
     tasks.push({ name: task, state: false });
+    saveTasks();
 }
 
 /**
@@ -29,6 +47,7 @@ function done(task) {
     if (idx != -1) {
         tasks[idx].state = true;
     }
+    saveTasks();
 }
 
 /**
@@ -50,6 +69,7 @@ function del(task) {
     if (idx != -1) {
         tasks.splice(idx, 1);
     }
+    saveTasks();
 }
 
 module.exports = {
