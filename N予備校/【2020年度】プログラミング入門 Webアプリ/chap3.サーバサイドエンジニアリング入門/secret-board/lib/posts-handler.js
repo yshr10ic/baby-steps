@@ -17,6 +17,7 @@ const secretKey =
     'a7d958360c810dbd94bbfcfd80d0966e90906df302a870cdbffe655145cc4155a2' +
     '0d0d019b67899a912e0892630c0386829aa2c1f1237bf4f63d73711117410c2fc5' +
     '0c1472e87ecd6844d0805cd97c0ea8bbfbda507293beebc5d9';
+const oneTimeTokenMap = new Map();
 
 function handle(req, res) {
     const cookies = new Cookies(req, res);
@@ -34,11 +35,14 @@ function handle(req, res) {
                         .tz('Asia/Tokyo')
                         .format('YYYY年MM月DD日 HH時mm分ss秒');
                 });
+                const oneTimeToken = crypto.randomBytes(8).toString('hex');
+                oneTimeTokenMap.set(req.user, oneTimeToken);
                 res.end(pug.renderFile(
                     './views/posts.pug',
                     {
                         posts: posts,
-                        user: req.user
+                        user: req.user,
+                        oneTimeToken: oneTimeToken
                     }
                 ));
                 console.info(
@@ -57,14 +61,25 @@ function handle(req, res) {
                 .on('end', () => {
                     body = Buffer.concat(body).toString();
                     const decoded = decodeURIComponent(body);
-                    const content = decoded.split('content=')[1];
-                    Post.create({
-                        content: content,
-                        trackingCookie: trackingId,
-                        postedBy: req.user
-                    }).then(() => {
-                        handleRedirectPosts(req, res);
-                    });
+                    const matchResult = decoded.match(/content=(.*)&oneTimeToken=(.*)/);
+                    if (!matchResult) {
+                        util.handleBadRequest(req, res);
+                    } else {
+                        const content = matchResult[1];
+                        const requestedOneTimeToken = matchResult[2];
+                        if (oneTimeTokenMap.get(req.user) === requestedOneTimeToken) {
+                            Post.create({
+                                content: content,
+                                trackingCookie: trackingId,
+                                postedBy: req.user
+                            }).then(() => {
+                                oneTimeTokenMap.delete(req.user);
+                                handleRedirectPosts(req, res);
+                            });
+                        } else {
+                            util.handleBadRequest(req, res);
+                        }
+                    }
                 });
             break;
         default:
@@ -84,19 +99,26 @@ function handleDelete(req, res) {
                 .on('end', () => {
                     body = Buffer.concat(body).toString();
                     const decoded = decodeURIComponent(body);
-                    const id = decoded.split('id=')[1];
-                    Post.findByPk(id).then((post) => {
-                        if (req.user === post.postedBy || req.user === 'admin') {
-                            post.destroy().then(() => {
-                                console.info(
-                                    `削除されました: user: ${req.user}, ` +
-                                    `remoteAddress: ${req.connection.remoteAddress}, ` +
-                                    `userAgent: ${req.headers['user-agent']} `
-                                );
-                                handleRedirectPosts(req, res);
-                            });
-                        }
-                    })
+                    const dataArray = decoded.split('&');
+                    const id = dataArray[0] ? dataArray[0].split('id=')[1] : '';
+                    const requestedOneTimeToken = dataArray[1] ? dataArray[1].split('oneTimeToken=')[1] : '';
+                    if (oneTimeTokenMap.get(req.user) === requestedOneTimeToken) {
+                        Post.findByPk(id).then((post) => {
+                            if (req.user === post.postedBy || req.user === 'admin') {
+                                post.destroy().then(() => {
+                                    console.info(
+                                        `削除されました: user: ${req.user}, ` +
+                                        `remoteAddress: ${req.connection.remoteAddress}, ` +
+                                        `userAgent: ${req.headers['user-agent']} `
+                                    );
+                                    oneTimeTokenMap.delete(req.user);
+                                    handleRedirectPosts(req, res);
+                                });
+                            }
+                        });
+                    } else {
+                        util.handleBadRequest(req, res);
+                    }
                 });
             break;
         default:

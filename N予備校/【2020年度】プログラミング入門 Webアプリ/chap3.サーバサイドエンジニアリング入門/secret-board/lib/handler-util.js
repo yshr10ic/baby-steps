@@ -6,7 +6,7 @@ function handleBadRequest(req, res) {
     res.writeHead(401, {
         'Content-Type': 'text/plain; charset=utf-8'
     });
-    res.end('未対応のメソッドです');
+    res.end('未対応のリクエストです');
 }
 
 function handleLogout(req, res) {
