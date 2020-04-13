@@ -19,7 +19,8 @@
     "pg": "^8.0.2",
     "pg-hstore": "^2.3.3",
     "pug": "2.0.0-beta11",
-    "sequelize": "^5.21.6"
+    "sequelize": "^5.21.6",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
     "jest": "^25.3.0",
