@@ -4,7 +4,8 @@ const TOKEN = PropertiesService.getScriptProperties().getProperty('TOKEN');
 function exec() {
   commitLogs = getCommitLogs();
   updateSheet(commitLogs);
-  body = getBody(commitLogs);
+  commitDays = getCommitDays();
+  body = getBody(commitLogs, commitDays);
   sendToSlack('notifications', body);
 }
 
@@ -30,7 +31,7 @@ function sendToSlack(channel, body) {
   UrlFetchApp.fetch(url, options);
 }
 
-function getBody(commitLogs){
+function getBody(commitLogs, commitDays){
   var targetDate = Moment.moment();
   targetDate = targetDate.subtract(1, 'days');
   var targetDateStr = targetDate.format('YYYY/MM/DD');
@@ -47,10 +48,34 @@ function getBody(commitLogs){
       body += commitLogs[i]['repoName'] + ' のコミット数は ' + commitLogs[i]['contributionCount'] + ' 件\n';
       totalCount += commitLogs[i]['contributionCount'];
     }
-    body += '合計 ' + totalCount + ' 件```\n';
+    body += '合計 ' + totalCount + ' 件```\n\n';
+    body += commitDays + '日連続でコミット中です💯この調子で頑張りましょう💪';
   }
   
   return body;
+}
+
+function getCommitDays() {
+  var sheet = SpreadsheetApp.getActive().getSheetByName('コミットログ');
+  var row = sheet.getRange('A:A').getValues().filter(String).length;
+  var currentDate = Moment.moment(sheet.getRange(row, 1).getValue());
+  var previousDate = Moment.moment(sheet.getRange(row, 1).getValue());
+  var commitDays = 1;
+  
+  for (var i = row - 1; i > 0; i--) {
+    previousDate = Moment.moment(sheet.getRange(i, 1).getValue());
+    diffDays = currentDate.diff(previousDate, 'days');
+    if (diffDays === 0) {
+      continue;
+    } else if (diffDays === 1) {
+      commitDays++;
+    } else {
+      break;
+    }
+    currentDate = previousDate;
+  }
+  
+  return commitDays;
 }
 
 function updateSheet(commitLogs) {
