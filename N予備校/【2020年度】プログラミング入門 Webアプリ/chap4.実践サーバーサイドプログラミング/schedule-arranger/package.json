@@ -13,6 +13,7 @@
     "express-session": "^1.17.0",
     "helmet": "^3.22.0",
     "http-errors": "~1.6.3",
+    "jquery": "^3.5.0",
     "morgan": "~1.9.1",
     "passport": "^0.4.1",
     "passport-github2": "^0.1.12",
@@ -23,8 +24,13 @@
     "uuid": "^7.0.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "babel-loader": "^8.1.0",
     "jest": "^25.3.0",
     "passport-stub": "^1.1.1",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
   }
 }
