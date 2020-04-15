@@ -15,6 +15,11 @@
         "32": "images/n_icon32.png",
         "48": "images/n_icon48.png",
         "128": "images/n_icon128.png"
-     },
+    },
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "permissions": ["activeTab"],
     "manifest_version": 2
 }
