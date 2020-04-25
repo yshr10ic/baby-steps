@@ -1,4 +1,4 @@
-from rest_framework import viewsets, mixin
+from rest_framework import viewsets, mixins
 from . import models
 from . import serializer
 
