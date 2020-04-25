@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from rest_framework import viewsets, mixin
+from . import models
+from . import serializer
 
-# Create your views here.
+
+class ThreadViewSet(viewsets.ModelViewSet):
+    queryset = models.Thread.objects.all()
+    serializer_class = serializer.ThreadSerializer
