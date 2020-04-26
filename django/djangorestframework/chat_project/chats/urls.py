@@ -3,4 +3,4 @@ from . import views
 
 
 router = routers.DefaultRouter()
-router.register(r'threads', views.ThreadViewSet)
+router.register(r'threads', views.ThreadViewSet, basename='threads')
